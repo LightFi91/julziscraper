@@ -1,0 +1,56 @@
+hits": [
+        {
+            "id": "521D_2023_8596301_060",
+            "product_name": "NORTH STAR MEN SNEAKERS",
+            "currency": "MYR",
+            "price": 119.0,
+            "orderable": true,
+            "image": {
+                "alt": "NORTH STAR MEN SNEAKERS",
+                "title": "NORTH STAR MEN SNEAKERS",
+                "url": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/BCLG_STG/on/demandware.static/-/Sites-bata-my-master-catalog/default/dw7594025d/images/large/8596301_1.jpg"
+            }
+        },
+        {
+            "id": "521D_2023_8116226_060",
+            "product_name": "BATA COMFIT MEN SHOES",
+            "currency": "MYR",
+            "price": 139.0,
+            "orderable": true,
+            "image": {
+                "alt": "BATA COMFIT MEN SHOES",
+                "title": "BATA COMFIT MEN SHOES",
+                "url": "https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/BCLG_STG/on/demandware.static/-/Sites-bata-my-master-catalog/default/dw9321edc9/images/large/8116226_1.jpg"
+            }
+        },
+
+
+
+
+
+
+
+
+
+
+        {
+            'product_id': '1',
+            'variation_groups': [{'product_id': '2', 'color': 'blue'}, {'product_id': '3', 'color': 'green'}],
+            'handle': '52b18368-7bfc-4a84-9a42-d20d23b04a8a'
+        }
+        {
+            'product_id': '2',
+            'variation_groups': [{'product_id': '1', 'color': 'red'}, {'product_id': '3', 'color': 'green'}],
+            'handle': '52b18368-7bfc-4a84-9a42-d20d23b04a8a'
+        }
+        {
+            'product_id': '3',
+            'variation_groups': [{'product_id': '1', 'color': 'red'}, {'product_id': '2', 'color': 'blue'}],
+            'handle': '52b18368-7bfc-4a84-9a42-d20d23b04a8a'
+        }
+        {
+            'product_id': '4',
+            'variation_groups': [],
+            'handle': '8901fb59-8b89-4be5-a5e5-97298b4c25e4'
+        }
+        

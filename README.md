@@ -16,3 +16,8 @@ BEFORE EACH FRESH RUN (DAY):
 
 - Delete old `bata.csv` + `done_ids.txt`
 - start running `bata.csv`
+
+
+521D_2020_5429739_040
+
+failed: 521D_2020_5612458_060 
