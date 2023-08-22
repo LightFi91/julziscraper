@@ -21,7 +21,20 @@ def write_file(data):
 #     comma_separated = 
 
 # Open the input CSV file
-with open('bata.csv', 'r') as infile:
+# import os
+
+# # Get the current working directory
+# cwd = os.getcwd()
+# print("Current working directory: {0}".format(cwd))
+
+# # Check if the file exists
+# file_path = os.path.join(cwd, 'data/1.csv')
+# if not os.path.isfile(file_path):
+#     print("File does not exist: {0}".format(file_path))
+# else:
+#     print("File exists: {0}".format(file_path))
+
+with open('./julziscraper/data/1.csv', 'r') as infile:
     reader = csv.DictReader(infile)
     rows = list(reader)
     # Create a list to hold the new rows

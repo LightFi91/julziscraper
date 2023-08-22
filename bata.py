@@ -1,7 +1,3 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 import requests
 import json
 import csv
@@ -158,7 +154,7 @@ done_file = open("./julziscraper/done_ids.txt", "a+")
 done_file.seek(0)
 done_data = [v.strip() for v in done_file.readlines()]
 
-auth_token = "eyJraWQiOiJKZzBUN1p0Y0xmbzhkSUpKME91aFJ3MkU0Um1FODJra2ltRWFaMzNWS1JBPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJkMjQ2MzJkYi04NDBjLTRhODQtODM0Ni0yMzE4NGVkOWM4YTciLCJjb2duaXRvOmdyb3VwcyI6WyJhcC1zb3V0aC0xX3Q4ZEhXZTNnWV9BQUQtSURQIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoLTFfdDhkSFdlM2dZIiwidmVyc2lvbiI6MiwiY2xpZW50X2lkIjoiN2p0bnFsc2JhZzFlbTUyNG4wdGZucXVoaWEiLCJvcmlnaW5fanRpIjoiODY4MjA4ZTMtNmRlMi00MTViLTkwZDUtZDk0NTVmNGE1Mjc4IiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiBvcGVuaWQgcHJvZmlsZSBlbWFpbCIsImF1dGhfdGltZSI6MTY5MTAyMTg4OSwiZXhwIjoxNjkyNTY0MjQ5LCJpYXQiOjE2OTI1NjA2NDksImp0aSI6IjdhZGJjM2ZhLTUzMDYtNDAyZS1iZGRlLWU2ZGI2MmYxMzk4OCIsInVzZXJuYW1lIjoiYWFkLWlkcF81MjEuNTIxNjNAYmF0YS5jb20ifQ.yPiRrR8e485KNyhQig3BN59k1jJBB2M9hAgtvy5lvwzW3606RK4yYxWSDdwGsRkLqoe6CZs8NTkYnFh2MT_apgjWuFnytEg1sBqSKOodaWPpyWApQUyjb36i6oiLk9KD4Fyo2Sj0_xwDCAMWWhachqJOFnM_XvArLJyO1FoOCfGFDf2CwIgq0VqzfDLtIe5jpFF1Jf52lnZ2ARJBPKOu3Q-5RBAxNNZJnZ6GvBCiXvBq9h-gExjpy_o7AuDovu5wCMjdLsfNumFsQxSHcR3n0xQQVQH4XKC9PQ94gzJdsMqj2Vs7_kLC9HH4AGO5fAbdgreeKgluxX9LpWFX9jwtRQ"
+auth_token = "eyJraWQiOiJKZzBUN1p0Y0xmbzhkSUpKME91aFJ3MkU0Um1FODJra2ltRWFaMzNWS1JBPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJkMjQ2MzJkYi04NDBjLTRhODQtODM0Ni0yMzE4NGVkOWM4YTciLCJjb2duaXRvOmdyb3VwcyI6WyJhcC1zb3V0aC0xX3Q4ZEhXZTNnWV9BQUQtSURQIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoLTFfdDhkSFdlM2dZIiwidmVyc2lvbiI6MiwiY2xpZW50X2lkIjoiN2p0bnFsc2JhZzFlbTUyNG4wdGZucXVoaWEiLCJvcmlnaW5fanRpIjoiODY4MjA4ZTMtNmRlMi00MTViLTkwZDUtZDk0NTVmNGE1Mjc4IiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiBvcGVuaWQgcHJvZmlsZSBlbWFpbCIsImF1dGhfdGltZSI6MTY5MTAyMTg4OSwiZXhwIjoxNjkyNzIxODEyLCJpYXQiOjE2OTI3MTgyMTIsImp0aSI6ImViM2Q0ZjM4LWEzOTMtNDQ3ZC1iYTJmLWQ3Y2U0Njc2NTM4MiIsInVzZXJuYW1lIjoiYWFkLWlkcF81MjEuNTIxNjNAYmF0YS5jb20ifQ.CChAxykgWqDNLI_zfkwcNs9nB5cg5TuW3p_FE1XM4hcf65DN8OVHy2_jRufUE6NqPb_lADo0499MJKcCuthiDOH5mnAB1OoySgA9GNFslXKiiUKyceY_tVm6ME0XGhSSsxMJSZekSc-FpF90M1KfDbPB5iCCJZ9FHyrtC-PegwDXRdiTA6AAd1zzPIVMhs5eT_YgW77-kb7rMT0zygE5pkVOiZ1sKnZ_pXaYh0sTmF8CsgaSxUU5q0rLkJIiddQeyBAX2BNne20dap_cSjHbAi1t0f7oLjhdKQ6gknw87NDJYcNTkghwo1zfugpoEhgCJ0eW6V9Coheq9XwCZka5RgQ"
 
 headers = {
     "authority": "bata-my-api.instoreapp.io",
@@ -224,9 +220,12 @@ def get_results(category, max_count=200, offset=0, all_results=None):
         else:
             return all_results
     else:
+        print(f"Error: {response.status_code}")
+        print(f"Error details: {response.text}")
+        
         # auth_token = input("Enter new auth token:\n")
         # return get_results(category, max_count, offset, all_results)
-        print(f"Error: {response.status_code}")
+        # print(f"Error: {response.status_code}")
         return all_results
 
 def extract_product_id(url):
