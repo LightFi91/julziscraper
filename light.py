@@ -4,8 +4,8 @@ import os
 import glob
 
 def read_files_serially():
-    # Get the list of existing files in the /data directory
-    existing_files = os.listdir('./julziscraper/data')
+    # Get the list of existing files in the /batadb directory
+    existing_files = os.listdir('./batadb')
 
     # Filter out non-CSV files and extract serial numbers
     existing_serials = [int(f[:-4]) for f in existing_files if f.endswith('.csv')]
@@ -13,10 +13,10 @@ def read_files_serially():
     # Determine the serial number for the new file
     if existing_serials:
         latest_serial = max(existing_serials)
-    latest_file = f'./julziscraper/data/{latest_serial}.csv'
+    latest_file = f'./batadb/{latest_serial}.csv'
     # Determine the previous file (if any)
     if latest_serial > 0:
-        previous_file = f'./julziscraper/data/{latest_serial - 1}.csv'
+        previous_file = f'./batadb/{latest_serial - 1}.csv'
     else:
         previous_file = None
     
@@ -33,7 +33,7 @@ def extract_product_id(url):
     
 def write_file(data):
     # Write the new rows to a new CSV file
-    with open('julziscraper/output.csv', 'w', newline='') as outfile:
+    with open('./batadb/output.csv', 'w', newline='') as outfile:
         writer = csv.DictWriter(outfile, fieldnames=['Handle', 'Title', 'Collection', 'Option1 Name', 'Option1 Value', 'Option2 Name', 'Option2 Value', 'Option3 Name', 'Option3 Value',  'Variant Inventory Policy', 'Variant Inventory Qty', 'Variant Inventory Tracker', 'Variant Price', 'Image Src', 'Image Alt Text', 'Variant SKU']) #, 'Image Position' , 'Variant Inventory Tracker','Variant Image',
         writer.writeheader()
         writer.writerows(data)

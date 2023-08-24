@@ -8,7 +8,13 @@ WORKDIR /app
 ADD . /app
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
+
+# Create a volume named 'bata' and set it as the mount point for /app/data
+VOLUME /app/batadb
+
+# Set an environment variable to determine which script to run
+ENV SCRIPT_NAME bata.py
 
 # Run app.py when the container launches
-CMD ["python", "julziscraper/bata.py"]
+CMD python $SCRIPT_NAME

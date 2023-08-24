@@ -21,3 +21,6 @@ BEFORE EACH FRESH RUN (DAY):
 521D_2020_5429739_040
 
 failed: 521D_2020_5612458_060 
+
+
+docker run -v /Users/nour/Dev/bata-data:/app/data nhelmi/bata-scraper --build-arg SCRIPT_NAME=bata.py

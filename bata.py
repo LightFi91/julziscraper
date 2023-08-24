@@ -73,8 +73,8 @@ header = ["url", "id", "name", "product_code", "price", "size_type", "summary", 
 all_products = []
 
 def write_serial_csv(fields):
-    # Get the list of existing files in the /data directory
-    existing_files = os.listdir('./julziscraper/data')
+    # Get the list of existing files in the /batadb directory
+    existing_files = os.listdir('./batadb')
 
     # Filter out non-CSV files and extract serial numbers
     existing_serials = [int(f[:-4]) for f in existing_files if f.endswith('.csv')]
@@ -87,7 +87,7 @@ def write_serial_csv(fields):
 
     # Determine the previous file (if any)
     if new_serial > 0:
-        previous_file = f'./julziscraper/data/{new_serial - 1}.csv'
+        previous_file = f'./batadb/{new_serial - 1}.csv'
     else:
         previous_file = None
 
@@ -102,7 +102,7 @@ def write_serial_csv(fields):
         return previous_file, None
 
     # Create the new file
-    new_file = f'./julziscraper/data/{new_serial}.csv'
+    new_file = f'./batadb/{new_serial}.csv'
     with open(new_file, 'w', newline="", encoding='utf-8-sig') as file:
         csv_writer = csv.DictWriter(file, fieldnames=fields)
         csv_writer.writeheader()
@@ -111,12 +111,12 @@ def write_serial_csv(fields):
 
 
 def read_load_data_status():
-    with open("./julziscraper/loading_status.json", 'r') as file:
+    with open("./batadb/loading_status.json", 'r') as file:
         data = json.load(file)
         return data.get('failed_to_load_data', True)
 
 def write_load_data_status(status):
-    with open("./julziscraper/loading_status.json", 'w') as file:
+    with open("./batadb/loading_status.json", 'w') as file:
         json.dump({'failed_to_load_data': status}, file)
 
 
@@ -150,16 +150,16 @@ if read_load_data_status():
 #     csv_writer = csv.DictWriter(file, fieldnames=header)
 #     csv_writer.writeheader()
 
-done_file = open("./julziscraper/done_ids.txt", "a+")
+done_file = open("./batadb/done_ids.txt", "a+")
 done_file.seek(0)
 done_data = [v.strip() for v in done_file.readlines()]
 
-auth_token = "eyJraWQiOiJKZzBUN1p0Y0xmbzhkSUpKME91aFJ3MkU0Um1FODJra2ltRWFaMzNWS1JBPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJkMjQ2MzJkYi04NDBjLTRhODQtODM0Ni0yMzE4NGVkOWM4YTciLCJjb2duaXRvOmdyb3VwcyI6WyJhcC1zb3V0aC0xX3Q4ZEhXZTNnWV9BQUQtSURQIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoLTFfdDhkSFdlM2dZIiwidmVyc2lvbiI6MiwiY2xpZW50X2lkIjoiN2p0bnFsc2JhZzFlbTUyNG4wdGZucXVoaWEiLCJvcmlnaW5fanRpIjoiODY4MjA4ZTMtNmRlMi00MTViLTkwZDUtZDk0NTVmNGE1Mjc4IiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiBvcGVuaWQgcHJvZmlsZSBlbWFpbCIsImF1dGhfdGltZSI6MTY5MTAyMTg4OSwiZXhwIjoxNjkyNzIxODEyLCJpYXQiOjE2OTI3MTgyMTIsImp0aSI6ImViM2Q0ZjM4LWEzOTMtNDQ3ZC1iYTJmLWQ3Y2U0Njc2NTM4MiIsInVzZXJuYW1lIjoiYWFkLWlkcF81MjEuNTIxNjNAYmF0YS5jb20ifQ.CChAxykgWqDNLI_zfkwcNs9nB5cg5TuW3p_FE1XM4hcf65DN8OVHy2_jRufUE6NqPb_lADo0499MJKcCuthiDOH5mnAB1OoySgA9GNFslXKiiUKyceY_tVm6ME0XGhSSsxMJSZekSc-FpF90M1KfDbPB5iCCJZ9FHyrtC-PegwDXRdiTA6AAd1zzPIVMhs5eT_YgW77-kb7rMT0zygE5pkVOiZ1sKnZ_pXaYh0sTmF8CsgaSxUU5q0rLkJIiddQeyBAX2BNne20dap_cSjHbAi1t0f7oLjhdKQ6gknw87NDJYcNTkghwo1zfugpoEhgCJ0eW6V9Coheq9XwCZka5RgQ"
+auth_token = "eyJraWQiOiJKZzBUN1p0Y0xmbzhkSUpKME91aFJ3MkU0Um1FODJra2ltRWFaMzNWS1JBPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJkMjQ2MzJkYi04NDBjLTRhODQtODM0Ni0yMzE4NGVkOWM4YTciLCJjb2duaXRvOmdyb3VwcyI6WyJhcC1zb3V0aC0xX3Q4ZEhXZTNnWV9BQUQtSURQIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoLTFfdDhkSFdlM2dZIiwidmVyc2lvbiI6MiwiY2xpZW50X2lkIjoiN2p0bnFsc2JhZzFlbTUyNG4wdGZucXVoaWEiLCJvcmlnaW5fanRpIjoiODY4MjA4ZTMtNmRlMi00MTViLTkwZDUtZDk0NTVmNGE1Mjc4IiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiBvcGVuaWQgcHJvZmlsZSBlbWFpbCIsImF1dGhfdGltZSI6MTY5MTAyMTg4OSwiZXhwIjoxNjkyNzQxNjMzLCJpYXQiOjE2OTI3MzgwMzMsImp0aSI6ImFlZWQ4ZDJjLWNmNTAtNGM0Yi1hYzgwLTY2Y2FiMGM3Yjc4ZiIsInVzZXJuYW1lIjoiYWFkLWlkcF81MjEuNTIxNjNAYmF0YS5jb20ifQ.KEOxYAscKps_tKcXZcQ746TZxOUQEOS1U3UVsi7kqDVnvu3J12V3Qge5Kjb3E6mMXB_McdDNJx7S39vpY07aj-Esi_PwuF-f1jKwn787FeDSIi664vb_Fs2RkKv-zObUca9SaUL75Fe1Zye5JCoorsSd0svDPZYAWlw1zOxomVLuf1VE3sxYyQLJROVsRi0Q50TMcgcsJchGC1UCJxAn_x2-FK32689vzLLS9oqE3f49bJUV7huLSUbXCjz4Ko-MAU9Ke72wMB98CQ7mQgJqTsK3m2lg6K3i9eDhmXSvLnJ2bXi8ZMifUSPdnw2lWS-db9RJmhfgiLONbqk_kyURdww"
 
 headers = {
     "authority": "bata-my-api.instoreapp.io",
     "accept": "*/*",
-    "accept-language": "en-US,en;q=0.9",
+    "accept-language": "en-US,en;",
     "auth": auth_token,
     "origin": "https://bata-my.instoreapp.io",
     "referer": "https://bata-my.instoreapp.io/",
@@ -169,6 +169,7 @@ headers = {
     "sec-fetch-dest": "empty",
     "sec-fetch-mode": "cors",
     "sec-fetch-site": "same-site",
+    # "User-Agent": "curl/7.64.1",
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36",
     "x-api-key": "Rzjyz4oPcbaKxRjh37o9H807yPCpdFDK5uZgrQv9"
 }
@@ -375,7 +376,7 @@ def assign_group_id(product, variation_groups):
     return product
 
 def complete():
-    with open("./julziscraper/assigned_group_ids.json", "w") as file:
+    with open("./batadb/assigned_group_ids.json", "w") as file:
         json.dump(assigned_group_ids, file)
     done_file.close()
     file.close()
@@ -487,8 +488,7 @@ def remove_colors_from_title(colors, title):
     return title.strip()
 
 def finalise_products(file_path):
-
-    with open(csv_file_path, 'a', newline="", encoding='utf-8-sig') as file:
+    with open(file_path, 'a', newline="", encoding='utf-8-sig') as file:
         csv_writer = csv.DictWriter(file, fieldnames=header)
         for product in all_products: 
             id = product["id"]
