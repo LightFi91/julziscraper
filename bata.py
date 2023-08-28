@@ -5,6 +5,10 @@ import os
 import re
 import uuid
 import json
+from scrapfly import ScrapeConfig, ScrapflyClient, ScrapeApiResponse
+from urllib.parse import quote
+
+path_prefix = './julziscraper'
 
 header = ["url", "id", "name", "product_code", "price", "size_type", "summary", "type", "variant",
               "upperDescription", "articleNo", "CategoryCode", "group_id", "images", 
@@ -71,10 +75,19 @@ header = ["url", "id", "name", "product_code", "price", "size_type", "summary", 
               "Color_60", "Size_60", "availability_60", "images_60", "product_link_60"]
 
 all_products = []
-
 def write_serial_csv(fields):
+    current_directory = os.getcwd()
+    print("Current Directory:", current_directory)
+
+    # Get the list of files and folders in the current directory
+    files_and_folders = os.listdir(current_directory)
+
+    # Print each file and folder
+    for item in files_and_folders:
+        print(item)
+
     # Get the list of existing files in the /batadb directory
-    existing_files = os.listdir('./batadb')
+    existing_files = os.listdir(f'{path_prefix}/batadb')
 
     # Filter out non-CSV files and extract serial numbers
     existing_serials = [int(f[:-4]) for f in existing_files if f.endswith('.csv')]
@@ -87,12 +100,12 @@ def write_serial_csv(fields):
 
     # Determine the previous file (if any)
     if new_serial > 0:
-        previous_file = f'./batadb/{new_serial - 1}.csv'
+        previous_file = f'{path_prefix}/batadb/{new_serial - 1}.csv'
     else:
         previous_file = None
 
     # Check the status
-    status = read_load_data_status()
+    status = read_failed_loading_status()
 
     # If status is True, do not create a new file, only return the last indexed file
     if status:
@@ -102,7 +115,7 @@ def write_serial_csv(fields):
         return previous_file, None
 
     # Create the new file
-    new_file = f'./batadb/{new_serial}.csv'
+    new_file = f'{path_prefix}/batadb/{new_serial}.csv'
     with open(new_file, 'w', newline="", encoding='utf-8-sig') as file:
         csv_writer = csv.DictWriter(file, fieldnames=fields)
         csv_writer.writeheader()
@@ -110,13 +123,13 @@ def write_serial_csv(fields):
     return new_file, previous_file
 
 
-def read_load_data_status():
-    with open("./batadb/loading_status.json", 'r') as file:
+def read_failed_loading_status():
+    with open(f"{path_prefix}/batadb/loading_status.json", 'r') as file:
         data = json.load(file)
         return data.get('failed_to_load_data', True)
 
-def write_load_data_status(status):
-    with open("./batadb/loading_status.json", 'w') as file:
+def write_failed_loading_status(status):
+    with open(f"{path_prefix}/batadb/loading_status.json", 'w') as file:
         json.dump({'failed_to_load_data': status}, file)
 
 
@@ -124,12 +137,12 @@ def write_load_data_status(status):
 csv_file_path, _ = write_serial_csv(header)
 
 # data failed to load last time, meaning we haven't completed the loading of all data, read data into all_products and set it to true, will be set to false again when the data fails to load
-if read_load_data_status():
+if read_failed_loading_status():
     with open(csv_file_path, 'r', newline="", encoding='utf-8-sig') as file:
         csv_reader = csv.DictReader(file, fieldnames=header)
         for row in csv_reader:
             all_products.append(row)
-        write_load_data_status(False)
+        write_failed_loading_status(False)
 
 
 # if os.path.isfile('./bata.csv'):
@@ -150,48 +163,51 @@ if read_load_data_status():
 #     csv_writer = csv.DictWriter(file, fieldnames=header)
 #     csv_writer.writeheader()
 
-done_file = open("./batadb/done_ids.txt", "a+")
+done_file = open(f"{path_prefix}/batadb/done_ids.txt", "a+")
 done_file.seek(0)
 done_data = [v.strip() for v in done_file.readlines()]
 
-auth_token = "eyJraWQiOiJKZzBUN1p0Y0xmbzhkSUpKME91aFJ3MkU0Um1FODJra2ltRWFaMzNWS1JBPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJkMjQ2MzJkYi04NDBjLTRhODQtODM0Ni0yMzE4NGVkOWM4YTciLCJjb2duaXRvOmdyb3VwcyI6WyJhcC1zb3V0aC0xX3Q4ZEhXZTNnWV9BQUQtSURQIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoLTFfdDhkSFdlM2dZIiwidmVyc2lvbiI6MiwiY2xpZW50X2lkIjoiN2p0bnFsc2JhZzFlbTUyNG4wdGZucXVoaWEiLCJvcmlnaW5fanRpIjoiODY4MjA4ZTMtNmRlMi00MTViLTkwZDUtZDk0NTVmNGE1Mjc4IiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiBvcGVuaWQgcHJvZmlsZSBlbWFpbCIsImF1dGhfdGltZSI6MTY5MTAyMTg4OSwiZXhwIjoxNjkyNzQxNjMzLCJpYXQiOjE2OTI3MzgwMzMsImp0aSI6ImFlZWQ4ZDJjLWNmNTAtNGM0Yi1hYzgwLTY2Y2FiMGM3Yjc4ZiIsInVzZXJuYW1lIjoiYWFkLWlkcF81MjEuNTIxNjNAYmF0YS5jb20ifQ.KEOxYAscKps_tKcXZcQ746TZxOUQEOS1U3UVsi7kqDVnvu3J12V3Qge5Kjb3E6mMXB_McdDNJx7S39vpY07aj-Esi_PwuF-f1jKwn787FeDSIi664vb_Fs2RkKv-zObUca9SaUL75Fe1Zye5JCoorsSd0svDPZYAWlw1zOxomVLuf1VE3sxYyQLJROVsRi0Q50TMcgcsJchGC1UCJxAn_x2-FK32689vzLLS9oqE3f49bJUV7huLSUbXCjz4Ko-MAU9Ke72wMB98CQ7mQgJqTsK3m2lg6K3i9eDhmXSvLnJ2bXi8ZMifUSPdnw2lWS-db9RJmhfgiLONbqk_kyURdww"
+auth_token = "eyJraWQiOiJKZzBUN1p0Y0xmbzhkSUpKME91aFJ3MkU0Um1FODJra2ltRWFaMzNWS1JBPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJkMjQ2MzJkYi04NDBjLTRhODQtODM0Ni0yMzE4NGVkOWM4YTciLCJjb2duaXRvOmdyb3VwcyI6WyJhcC1zb3V0aC0xX3Q4ZEhXZTNnWV9BQUQtSURQIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoLTFfdDhkSFdlM2dZIiwidmVyc2lvbiI6MiwiY2xpZW50X2lkIjoiN2p0bnFsc2JhZzFlbTUyNG4wdGZucXVoaWEiLCJvcmlnaW5fanRpIjoiODY4MjA4ZTMtNmRlMi00MTViLTkwZDUtZDk0NTVmNGE1Mjc4IiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiBvcGVuaWQgcHJvZmlsZSBlbWFpbCIsImF1dGhfdGltZSI6MTY5MTAyMTg4OSwiZXhwIjoxNjkzMjE3NzMwLCJpYXQiOjE2OTMyMTQxMzAsImp0aSI6ImI1OGUxNzMwLTc1NjItNDllNC1iMTA1LTJjZWRlYmU2NDgzMyIsInVzZXJuYW1lIjoiYWFkLWlkcF81MjEuNTIxNjNAYmF0YS5jb20ifQ.xHGvpMS-VbuGaP9zCXuXPgQN5qu-Nc-8a-0rXqQZBrSkz2IiIP4Lfi-Uuslnl30Dz8cS8rg42QWVJXIuWG4HrffbcfreJVfzC-R0Z5rwlF9KIv9nUKJmGAknqLH6_iqlxSxIAZ0MdFRKe26kWdjcQNIK_h71651NQ_rBW5dqjYMTsBg24SMQMgiZEa1k2zETA3Q_Om8tt1IM_PMOfdvqtkVgrvAF1p4PSUL2RcKSZwzAvFoYqK8unOkgXfmmVzvbYYpmAVdeoUJKP1FLWOEqJDvLzMAXe1pwEX3qnosODEqueaP3ve9Zk8I4PBXeI2AltpLRDFsD9pKqKH2j6AMDjg"
 
 headers = {
-    "authority": "bata-my-api.instoreapp.io",
-    "accept": "*/*",
-    "accept-language": "en-US,en;",
-    "auth": auth_token,
-    "origin": "https://bata-my.instoreapp.io",
-    "referer": "https://bata-my.instoreapp.io/",
-    "sec-ch-ua": "\"Chromium\";v=\"110\", \"Not A(Brand\";v=\"24\", \"Google Chrome\";v=\"110\"",
-    "sec-ch-ua-mobile": "?0",
-    "sec-ch-ua-platform": "\"Windows\"",
-    "sec-fetch-dest": "empty",
-    "sec-fetch-mode": "cors",
-    "sec-fetch-site": "same-site",
+    # ":authority:": "bata-my-api.instoreapp.io",
+    "Accept": "*/*",
+    "Accept-Language": "en-US,en;",
+    "Auth": auth_token,
+    "Origin": "https://bata-my.instoreapp.io",
+    "Referer": "https://bata-my.instoreapp.io/",
+    "Sec-Ch-Ua": "\"Chromium\";v=\"110\", \"Not A(Brand\";v=\"24\", \"Google Chrome\";v=\"110\"",
+    "Sec-Ch-Ua-Mobile": "?0",
+    "Sec-Ch-Ua-Platform": "\"macOS\"",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-site",
     # "User-Agent": "curl/7.64.1",
-    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36",
-    "x-api-key": "Rzjyz4oPcbaKxRjh37o9H807yPCpdFDK5uZgrQv9"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36",
+    "X-Api-Key": "Rzjyz4oPcbaKxRjh37o9H807yPCpdFDK5uZgrQv9"
 }
 
-
 assigned_group_ids = {}
-
+apikey = "scp-live-a82f000a5ba845e6a30e975435436c91"
+scrapfly = ScrapflyClient(key=apikey)
 
 def get_images(key):
-    res = requests.get(f"https://bata-my-api.instoreapp.io/sfcc/ocapi/products/productVariations/{key}", headers=headers)
-    if res.status_code == 200:
-        page_resp = json.loads(res.text)
-        for data in page_resp["data"]:
-            images = []
-            for img_group in data["image_groups"]:
-                if img_group["view_type"] == "large":
-                    for img in img_group["images"]:
-                        images.append(img["url"])
-            try:
-                return ','.join(images)
-            except:
-                return []
+    try: 
+        api_response: ScrapeApiResponse = scrapfly.scrape(scrape_config=ScrapeConfig(url=f"https://bata-my-api.instoreapp.io/sfcc/ocapi/products/productVariations/{key}", headers=headers))
+        if api_response.scrape_success:
+            page_resp = json.loads(api_response.scrape_result['content'])
+            for data in page_resp["data"]:
+                images = []
+                for img_group in data["image_groups"]:
+                    if img_group["view_type"] == "large":
+                        for img in img_group["images"]:
+                            images.append(img["url"])
+                try:
+                    return ','.join(images)
+                except:
+                    return []
+    except:
+        return None
 
 def get_product_id(key):
     split_string = key.rsplit('_', 1)
@@ -207,22 +223,39 @@ def get_results(category, max_count=200, offset=0, all_results=None):
     if all_results is None:
         all_results = []
 
+    encoded_category = quote(category)
     url = f"https://bata-my-api.instoreapp.io/sfcc/ocapi/productSearch?category={category}&count={max_count}&offset={offset}"
-    response = requests.get(url, headers=headers)
 
-    if response.status_code == 200:
-        data = response.json()
+    # Encode the entire URL
+    encoded_url = quote(url, safe='')
+    try: 
+        api_response: ScrapeApiResponse = scrapfly.scrape(scrape_config=ScrapeConfig(url=url, headers=headers))
 
-        if 'hits' in data:
-            all_results.extend(data['hits'])
+        # response = requests.get(url, headers=headers)
 
-        if 'next' in data:
-            return get_results(category, max_count, offset + max_count, all_results)
+        if api_response.success:
+            # data = response.json()
+
+            data = json.loads(api_response.scrape_result['content'])
+            
+            if 'hits' in data:
+                all_results.extend(data['hits'])
+
+            if 'next' in data:
+                return get_results(category, max_count, offset + max_count, all_results)
+            else:
+                return all_results
         else:
+            print(f"Error: {api_response.status_code}")
+            print(f"Error details: {api_response.content}")
+            
+            # auth_token = input("Enter new auth token:\n")
+            # return get_results(category, max_count, offset, all_results)
+            # print(f"Error: {response.status_code}")
             return all_results
-    else:
-        print(f"Error: {response.status_code}")
-        print(f"Error details: {response.text}")
+    except:
+        print(f"Error: {api_response.status_code}")
+        print(f"Error details: {api_response.content}")
         
         # auth_token = input("Enter new auth token:\n")
         # return get_results(category, max_count, offset, all_results)
@@ -242,12 +275,20 @@ def split_article_no(id):
     return id.split("_")[-1]
 
 def load_product_data(code):
-    res = requests.get(f"https://bata-my-api.instoreapp.io/sfcc/ocapi/products/productVariations/{code}", headers=headers)
-    if res.status_code == 200:
-        page_resp = json.loads(res.text)
-        for data in page_resp["data"]:
-            return data
-    else:
+    # res = requests.get(f"https://bata-my-api.instoreapp.io/sfcc/ocapi/products/productVariations/{code}", headers=headers)
+    # Encode the entire URL
+    encoded_url = quote(f"https://bata-my-api.instoreapp.io/sfcc/ocapi/products/productVariations/{code}", safe='')
+    try:
+        api_response: ScrapeApiResponse = scrapfly.scrape(scrape_config=ScrapeConfig(url=encoded_url, headers=headers))
+        if api_response.scrape_success:
+            # page_resp = json.loads(res.text)
+            page_resp = json.loads(api_response.scrape_result['content'])
+            for data in page_resp["data"]:
+                return data
+        else:
+            print('-- response 401 for id : ' + code)
+            return None
+    except: 
         print('-- response 401 for id : ' + code)
         return None
 
@@ -376,7 +417,7 @@ def assign_group_id(product, variation_groups):
     return product
 
 def complete():
-    with open("./batadb/assigned_group_ids.json", "w") as file:
+    with open(f"{path_prefix}/batadb/assigned_group_ids.json", "w") as file:
         json.dump(assigned_group_ids, file)
     done_file.close()
     file.close()
@@ -397,7 +438,7 @@ print("--- all data length is --- ", sum(len(sub_list) for sub_list in all_data)
 all_colors = []
 
 for index, data in enumerate(all_data):
-    if read_load_data_status():
+    if read_failed_loading_status():
         break
 
     for index, hit in enumerate(data):
@@ -413,7 +454,7 @@ for index, data in enumerate(all_data):
         print('trying to load: ', id)
         data = load_product_data(id)
         if data is None:
-            write_load_data_status(True)
+            write_failed_loading_status(True)
             # failed_to_load_data = True
             # complete()
             break
@@ -466,8 +507,14 @@ for index, data in enumerate(all_data):
                             continue
                         if color == variation["variation_values"]["color"]:
                             #load variation images 
-                            product[f'images_{i}'] = get_images(variation["product_id"])
-                            loaded_variations.append(color)
+                            variation_images = get_images(variation["product_id"])
+                            if variation_images is None:
+                                # API error means unauthenticated most likely, so mark this product as unloaded, and break
+                                write_failed_loading_status(True)
+                                break
+                            else:
+                                product[f'images_{i}'] = variation_images
+                                loaded_variations.append(color)
                             # variation_ids.append(i)
                 except:
                     continue

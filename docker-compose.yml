@@ -1,0 +1,11 @@
+version: '3'
+services:
+  bata-scraper:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nhelmi/bata-scraper
+    volumes:
+      - /Users/nour/Dev/bata-data:/app/batadb
+    environment:
+      - SCRIPT_NAME=bata.py
