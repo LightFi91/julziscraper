@@ -9,7 +9,14 @@ def read_files_serially():
     existing_files = os.listdir(f'{path_prefix}/batadb')
 
     # Filter out non-CSV files and extract serial numbers
-    existing_serials = [int(f[:-4]) for f in existing_files if f.endswith('.csv')]
+    existing_serials = []
+    pattern = r"(\d+)\.csv"
+    for f in existing_files:
+        if f.endswith('.csv'):
+            match = re.search(pattern, f)
+            if match:
+                serial_number = int(match.group(1))
+                existing_serials.append(serial_number)
     latest_serial = 0
     # Determine the serial number for the new file
     if existing_serials:
@@ -102,7 +109,7 @@ def transform_data(file_path):
                 if row[f'Size_{i}'] and row[f'Size_{i}'] != '':
                     new_row['Option2 Name'] = 'Size'
                     try:
-                        new_row['Option2 Value'] = int(row[f'Size_{i}']) / 10
+                        new_row['Option2 Value'] = float(row[f'Size_{i}']) / 10
                     except:
                         new_row['Option2 Value'] = row[f'Size_{i}']
                     has_size = True

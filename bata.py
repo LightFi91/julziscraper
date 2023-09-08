@@ -90,7 +90,14 @@ def write_serial_csv(fields):
     existing_files = os.listdir(f'{path_prefix}/batadb')
 
     # Filter out non-CSV files and extract serial numbers
-    existing_serials = [int(f[:-4]) for f in existing_files if f.endswith('.csv')]
+    existing_serials = []
+    pattern = r"(\d+)\.csv"
+    for f in existing_files:
+        if f.endswith('.csv'):
+            match = re.search(pattern, f)
+            if match:
+                serial_number = int(match.group(1))
+                existing_serials.append(serial_number)
 
     # Determine the serial number for the new file
     if existing_serials:
@@ -140,6 +147,8 @@ csv_file_path, _ = write_serial_csv(header)
 if read_failed_loading_status():
     with open(csv_file_path, 'r', newline="", encoding='utf-8-sig') as file:
         csv_reader = csv.DictReader(file, fieldnames=header)
+        # skip the header row
+        next(csv_reader)
         for row in csv_reader:
             all_products.append(row)
         write_failed_loading_status(False)
@@ -167,7 +176,7 @@ done_file = open(f"{path_prefix}/batadb/done_ids.txt", "a+")
 done_file.seek(0)
 done_data = [v.strip() for v in done_file.readlines()]
 
-auth_token = "eyJraWQiOiJKZzBUN1p0Y0xmbzhkSUpKME91aFJ3MkU0Um1FODJra2ltRWFaMzNWS1JBPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJkMjQ2MzJkYi04NDBjLTRhODQtODM0Ni0yMzE4NGVkOWM4YTciLCJjb2duaXRvOmdyb3VwcyI6WyJhcC1zb3V0aC0xX3Q4ZEhXZTNnWV9BQUQtSURQIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoLTFfdDhkSFdlM2dZIiwidmVyc2lvbiI6MiwiY2xpZW50X2lkIjoiN2p0bnFsc2JhZzFlbTUyNG4wdGZucXVoaWEiLCJvcmlnaW5fanRpIjoiODY4MjA4ZTMtNmRlMi00MTViLTkwZDUtZDk0NTVmNGE1Mjc4IiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiBvcGVuaWQgcHJvZmlsZSBlbWFpbCIsImF1dGhfdGltZSI6MTY5MTAyMTg4OSwiZXhwIjoxNjkzMjE3NzMwLCJpYXQiOjE2OTMyMTQxMzAsImp0aSI6ImI1OGUxNzMwLTc1NjItNDllNC1iMTA1LTJjZWRlYmU2NDgzMyIsInVzZXJuYW1lIjoiYWFkLWlkcF81MjEuNTIxNjNAYmF0YS5jb20ifQ.xHGvpMS-VbuGaP9zCXuXPgQN5qu-Nc-8a-0rXqQZBrSkz2IiIP4Lfi-Uuslnl30Dz8cS8rg42QWVJXIuWG4HrffbcfreJVfzC-R0Z5rwlF9KIv9nUKJmGAknqLH6_iqlxSxIAZ0MdFRKe26kWdjcQNIK_h71651NQ_rBW5dqjYMTsBg24SMQMgiZEa1k2zETA3Q_Om8tt1IM_PMOfdvqtkVgrvAF1p4PSUL2RcKSZwzAvFoYqK8unOkgXfmmVzvbYYpmAVdeoUJKP1FLWOEqJDvLzMAXe1pwEX3qnosODEqueaP3ve9Zk8I4PBXeI2AltpLRDFsD9pKqKH2j6AMDjg"
+auth_token = "eyJraWQiOiJKZzBUN1p0Y0xmbzhkSUpKME91aFJ3MkU0Um1FODJra2ltRWFaMzNWS1JBPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJkMjQ2MzJkYi04NDBjLTRhODQtODM0Ni0yMzE4NGVkOWM4YTciLCJjb2duaXRvOmdyb3VwcyI6WyJhcC1zb3V0aC0xX3Q4ZEhXZTNnWV9BQUQtSURQIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aC0xLmFtYXpvbmF3cy5jb21cL2FwLXNvdXRoLTFfdDhkSFdlM2dZIiwidmVyc2lvbiI6MiwiY2xpZW50X2lkIjoiN2p0bnFsc2JhZzFlbTUyNG4wdGZucXVoaWEiLCJvcmlnaW5fanRpIjoiYTNkZTVlMzMtZTA3Mi00ZjU4LWFiODYtN2VhMGE2ZDM3MjllIiwidG9rZW5fdXNlIjoiYWNjZXNzIiwic2NvcGUiOiJhd3MuY29nbml0by5zaWduaW4udXNlci5hZG1pbiBvcGVuaWQgcHJvZmlsZSBlbWFpbCIsImF1dGhfdGltZSI6MTY5MzgyMzEzMiwiZXhwIjoxNjkzODU5MTc2LCJpYXQiOjE2OTM4NTU1NzYsImp0aSI6IjQ2NzkzZDg5LWFhOWUtNGFjMS04MWU0LWNlNmEyNjdiYjUyMyIsInVzZXJuYW1lIjoiYWFkLWlkcF81MjEuNTIxNjNAYmF0YS5jb20ifQ.ph7lZKMePgWW9zZUtFZEFzb1eOZWevrlaJhVAuwY965f6ey0z4BmbyxpXBJgkXTOYjQic49D_5lHbtbDGGgRhEa-_DgdxkJXtVfyfp2OqKgi6TaFrBXovJa9nRLbUySILTVDcfqxjeB5QPfwua60Tl30L_BpIJfyOel4m2oCq7JkbKNzo_SmihmLeyo_uRu8mmZWqtBGAEgMrZ4dPz8sHSeKjmYHiABLjlaVuC9Ub38LuR0kuPgCodgJSiCmUoNOYR3oE6P3znAkmtJOD98eDNY1sZHVSsoJOOv88P5IXgb7r7ZpgXfGwyrsL2GCkeQNqIUGgJa8RMErnw8stogdBg"
 
 headers = {
     # ":authority:": "bata-my-api.instoreapp.io",
@@ -206,7 +215,11 @@ def get_images(key):
                     return ','.join(images)
                 except:
                     return []
+                
+            # this happens in the event bata doesn't have the data for a variation, basically data discrepancy 
+            return []
     except:
+        print(f'Failed to load image key: {key}');
         return None
 
 def get_product_id(key):
@@ -495,7 +508,9 @@ for index, data in enumerate(all_data):
                 ordered_variations.append(variation)
 
         for variation in ordered_variations:
-            # variation_ids = {}
+            # can be made invalid with the images loading
+            if read_failed_loading_status():
+                break
             for i in range(60):
                 try:
                     if f'Color_{i}' not in product:
@@ -519,7 +534,9 @@ for index, data in enumerate(all_data):
                 except:
                     continue
         product = assign_group_id(product, variation_groups)
-
+        # can be made invalid with the images loading
+        if read_failed_loading_status():
+            break
         all_products.append(product)
 
 import re
@@ -540,10 +557,12 @@ def finalise_products(file_path):
         for product in all_products: 
             id = product["id"]
             product['name'] = remove_colors_from_title(all_colors, product['name'])
-            csv_writer.writerow(product)
-            done_data.append(id)
-            done_file.write(id + '\n')
-            done_file.flush()
+            # check if product not written
+            if id not in done_data:
+                csv_writer.writerow(product)
+                done_data.append(id)
+                done_file.write(id + '\n')
+                done_file.flush()
 
 finalise_products(csv_file_path)
 
