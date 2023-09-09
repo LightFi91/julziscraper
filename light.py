@@ -1,8 +1,7 @@
 import csv
 import re
 import os
-import glob
-path_prefix = './julziscraper'
+path_prefix = './'
 
 def read_files_serially():
     # Get the list of existing files in the /batadb directory

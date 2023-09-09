@@ -8,7 +8,7 @@
       "name": "light",
       "type": "python",
       "request": "launch",
-      "program": "./julziscraper/light.py",
+      "program": "./light.py",
       "console": "integratedTerminal",
       "justMyCode": true
     },
@@ -16,7 +16,7 @@
       "name": "bata",
       "type": "python",
       "request": "launch",
-      "program": "./julziscraper/bata.py",
+      "program": "./bata.py",
       "console": "integratedTerminal",
       "justMyCode": true
     },
