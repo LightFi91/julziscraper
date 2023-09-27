@@ -151,12 +151,27 @@ def transform_data(file_path):
             written_handles.append(new_row['Handle'])
         return new_rows
 
-
+import itertools
 
 latest_file, previous_file = read_files_serially()
 latest_data = transform_data(latest_file)
 if previous_file is not None:
     previous_data = transform_data(previous_file)
+
+def update_names():
+    with open(f'{path_prefix}batadb/updated_names.csv') as names_file:
+        names_reader = csv.DictReader(names_file)
+        names_rows = list(names_reader)
+        array_of_arrays = [[value for value in item.values()] for item in names_rows]
+        
+        lookup_dict = {row[0]: row[3] for row in array_of_arrays if row[3] != ''}
+
+        # Iterate over latest_data and update the 'Title' field if the handle exists in names_dict
+        for item in latest_data:
+            handle = item['Handle']
+            if handle in lookup_dict:
+                item['Title'] = lookup_dict[handle]
+update_names()
 
 # Get all handles in latest_data
 latest_handles = [row['Handle'] for row in latest_data]
