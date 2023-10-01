@@ -52,7 +52,7 @@ def write_file(data):
 
 def transform_data(file_path):
     # Open the input CSV file
-    with open(latest_file, 'r') as infile:
+    with open(file_path, 'r') as infile:
         reader = csv.DictReader(infile)
         rows = list(reader)
         # Create a list to hold the new rows
@@ -151,7 +151,6 @@ def transform_data(file_path):
             written_handles.append(new_row['Handle'])
         return new_rows
 
-import itertools
 
 latest_file, previous_file = read_files_serially()
 latest_data = transform_data(latest_file)
@@ -169,7 +168,7 @@ def update_names():
         # Iterate over latest_data and update the 'Title' field if the handle exists in names_dict
         for item in latest_data:
             handle = item['Handle']
-            if handle in lookup_dict:
+            if handle in lookup_dict and item['Title'] != '':
                 item['Title'] = lookup_dict[handle]
 update_names()
 
