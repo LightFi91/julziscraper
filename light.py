@@ -125,7 +125,7 @@ def transform_data(file_path):
                     has_color = True
                 # add 10 quantity where the product is available
                 # new_row['Varient Inventory Qty'] = 1
-                new_row['Variant Inventory Qty'] = 99999 if (row[f'availability_{i}'] == 'Available' and price > 0) else 0
+                new_row['Variant Inventory Qty'] = 99999 if (row[f'availability_{i}'] == 'Available' and price != '' and float(price) > 0) else 0
                 new_row['Variant Inventory Tracker'] = 'shopify'
                 new_row['Variant Inventory Policy'] = "continue" if row[f'availability_{i}'] == 'Available' else "deny"
                 new_row['Variant Price'] = price
